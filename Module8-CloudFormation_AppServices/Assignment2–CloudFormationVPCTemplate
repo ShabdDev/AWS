@@ -1,0 +1,127 @@
+
+# Module 8: Assignment 2 - AWS CloudFormation Custom VPC and EC2 Deployment
+
+## Problem Statement
+XYZ Corporation requires an automated environment provisioning pipeline to rapidly deploy networking and compute resources for parallel development sprints. Implement an AWS CloudFormation template to programmatically structure a custom Virtual Private Cloud (VPC), establish an Internet Gateway mapped to a Public Subnet, and automatically launch an Amazon Linux EC2 instance tagged explicitly as `CFinstance` within the network tier.
+
+---
+
+## Tasks To Be Performed
+1. Create a CloudFormation template that provisions 1 custom VPC and 1 Public Subnet.
+2. Launch an Amazon Linux EC2 instance inside the public subnet and apply the resource tag key-value: `Name: CFinstance`.
+
+---
+
+## Part 1: Step-by-Step Implementation Solution
+
+### Step 1: Create the CloudFormation Network and Compute Template
+1. Open a text editor (e.g., Notepad or VS Code) on your machine.
+2. Paste the following automated **YAML** infrastructure layout blueprint:
+
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template to deploy a custom VPC, Public Subnet, Internet Gateway, and an Amazon Linux EC2 instance.'
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64'
+    Description: 'Automatically fetches the latest Amazon Linux 2023 AMI ID.'
+Resources:
+  # 1. Create the Custom VPC
+  XYZCustomVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '10.50.0.0/16'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: 'XYZ-CloudFormation-VPC'
+  # 2. Create the Public Subnet
+  XYZPublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref XYZCustomVPC
+      CidrBlock: '10.50.1.0/24'
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: 'XYZ-Public-Subnet'
+  # 3. Create and Attach the Internet Gateway (Required for Public Internet Route)
+  XYZInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: 'XYZ-VPC-IGW'
+  VPCGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref XYZCustomVPC
+      InternetGatewayId: !Ref XYZInternetGateway
+  # 4. Route Table Configuration for Internet Access
+  XYZPublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref XYZCustomVPC
+      Tags:
+        - Key: Name
+          Value: 'XYZ-Public-RT'
+  XYZPublicRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref XYZPublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref XYZInternetGateway
+  XYZSubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref XYZPublicSubnet
+      RouteTableId: !Ref XYZPublicRouteTable
+  # 5. Launch the Amazon Linux EC2 Instance
+  CFInstanceResource:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: 't2.micro'
+      ImageId: !Ref LatestAmiId
+      SubnetId: !Ref XYZPublicSubnet
+      Tags:
+        - Key: Name
+          Value: 'CFinstance'
+Outputs:
+  InstanceId:
+    Description: 'The ID of the newly launched EC2 Instance.'
+    Value: !Ref CFInstanceResource
+  VpcId:
+    Description: 'The ID of the custom provisioned VPC.'
+    Value: !Ref XYZCustomVPC
+  ```
+
+3. Save this file locally on your desktop as **`vpc-ec2-template.yaml`**.
+
+---
+
+### Step 2: Deploy the Infrastructure Stack Container
+
+1. Log in to the **AWS Management Console** and open the **CloudFormation** console.
+2. Click **Create stack** > **With new resources (standard)**.
+3. Select **Template is ready**, click **Upload a template file**, choose `vpc-ec2-template.yaml` from your machine, and click **Next**.
+4. **Specify stack options:** Name the stack `XYZ-VPC-EC2-Stack` and click **Next**.
+5. Keep default tags and settings on the configurations page, click **Next**, scroll to the bottom summary view, and click **Submit**.
+6. **Verification:** The deployment logic will take about 2 minutes to create the VPC, subnets, routes, and instance. Wait until the status panel prints **CREATE_COMPLETE**.
+7. Navigate to the **EC2 Dashboard** > click **Instances**. You will see a newly launched `t2.micro` server running smoothly with the exact name tag **`CFinstance`**.
+
+---
+
+## Part 2: Step-by-Step Deletion Process (CRITICAL Cost Saving)
+
+To instantly eliminate the newly provisioned EC2 instance alongside the nested VPC routes before any hourly compute infrastructure charges compile, execute this single teardown process:
+
+### 1. Delete the CloudFormation Stack
+
+1. Open the **AWS CloudFormation Dashboard** and select the **Stacks** view interface.
+2. Click on the radio checkbox group matching **`XYZ-VPC-EC2-Stack`**.
+3. Locate the top action control menu block and click the **Delete** button.
+4. Confirm by clicking **Delete stack** on the verification dialog window.
+5. **Automation Result:** CloudFormation will systematically terminate `CFinstance`, detach the `XYZ-VPC-IGW`, drop the custom route tables, and fully erase the custom VPC without requiring any manual per-resource sorting. Monitor until the stack row disappears completely from the tracking log directory.
