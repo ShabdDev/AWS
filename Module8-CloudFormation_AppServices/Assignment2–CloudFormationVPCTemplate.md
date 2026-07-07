@@ -102,10 +102,10 @@ Outputs:
   InstanceId:
     Description: 'The ID of the newly launched EC2 Instance.'
     Value: !Ref CFInstanceResource
-
   VpcId:
     Description: 'The ID of the custom provisioned VPC.'
     Value: !Ref XYZCustomVPC
+
 ```
 
 3. Save this file locally on your desktop as **`vpc-ec2-template.yaml`**.
