@@ -186,6 +186,25 @@ Every argument (file names, usernames, IP addresses, paths, package names,specia
 Why each part is used in that specific command
 
 This will make the Markdown document useful not only for completing the assignment but also for revising Linux commands and preparing for interviews.
+
+for example : 
+```bash
+echo "Created from Ubuntu" | sudo tee /efs/ubuntu.txt
+```
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `echo` | Displays the specified text on the terminal's standard output (stdout). |
+| `"Created from Ubuntu"` | The text string that `echo` outputs. In this assignment, it is the content that will be written to the file. |
+| `\|` | **Pipe operator**. Sends the output of the command on the left (`echo`) as the input to the command on the right (`tee`). |
+| `sudo` | **SuperUser DO**. Executes the `tee` command with administrator (root) privileges, ensuring it has permission to write to the mounted EFS directory if required. |
+| `tee` | Reads input from standard input (stdin) and writes it to the specified file while also displaying the same content on the terminal. |
+| `/efs/ubuntu.txt` | The file that will be created (or overwritten if it already exists) inside the mounted Amazon EFS file system. Since `/efs` is the EFS mount point, the file is stored on the shared EFS storage and becomes accessible from all connected EC2 instances. |
+
+---
+
+
 ---
 
 
