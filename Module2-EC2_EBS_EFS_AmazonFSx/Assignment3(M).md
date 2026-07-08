@@ -1042,13 +1042,27 @@ Update the package repository.
 ```bash
 sudo apt update
 ```
+### Command Breakdown
 
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges. Updating the system package index is a system-level operation, so root permissions are required. |
+| `apt` | **Advanced Package Tool**. Ubuntu's package manager used to install, update, remove, and manage software packages. |
+| `update` | Downloads the latest package information (package lists) from the configured repositories and refreshes the local package index. It **does not** install or upgrade any software. |
 Install the NFS client package.
 
 ```bash
 sudo apt install -y nfs-common
 ```
+### Command Breakdown
 
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because installing software requires elevated permissions. |
+| `apt` | **Advanced Package Tool**. Ubuntu's package manager used to install, update, remove, and manage software packages. |
+| `install` | Tells `apt` to download and install the specified software package along with any required dependencies. |
+| `-y` | Automatically answers **"Yes"** to all confirmation prompts, allowing the installation to proceed without requiring user input. |
+| `nfs-common` | The Ubuntu package that installs the **NFS (Network File System) client utilities** required to connect to and mount Amazon EFS. |
 ---
 
 ## Why is this step required?
@@ -1085,7 +1099,15 @@ Connect to the RHEL instance.
 ```bash
 sudo dnf install -y nfs-utils
 ```
+### Command Breakdown
 
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because installing software requires elevated permissions. |
+| `dnf` | **Dandified YUM**. The default package manager for Red Hat Enterprise Linux (RHEL) 8/9, used to install, update, remove, and manage software packages. |
+| `install` | Tells `dnf` to download and install the specified software package along with any required dependencies. |
+| `-y` | Automatically answers **"Yes"** to all confirmation prompts, allowing the installation to proceed without requiring user interaction. |
+| `nfs-utils` | The RHEL package that installs the **NFS (Network File System) client and utility programs** required to connect to and mount Amazon EFS. |
 ---
 
 ## Why is this step required?
@@ -1118,7 +1140,15 @@ Connect to the Amazon Linux 2 instance.
 ```bash
 sudo yum install -y nfs-utils
 ```
+### Command Breakdown
 
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because installing software requires elevated permissions. |
+| `yum` | **Yellowdog Updater, Modified**. The package manager used by Amazon Linux 2 to install, update, remove, and manage software packages. |
+| `install` | Tells `yum` to download and install the specified software package along with any required dependencies. |
+| `-y` | Automatically answers **"Yes"** to all confirmation prompts, allowing the installation to proceed without requiring user interaction. |
+| `nfs-utils` | The package that installs the **NFS (Network File System) client and utility programs** required to connect to and mount Amazon EFS. |
 ---
 
 ## Why is this step required?
@@ -1149,7 +1179,13 @@ The mount command will fail because the NFS client software is not installed.
 ```bash
 sudo mkdir /efs
 ```
+### Command Breakdown
 
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because creating directories in the root (`/`) location requires elevated permissions. |
+| `mkdir` | **Make Directory**. Creates a new directory (folder) in the specified location. |
+| `/efs` | The absolute path of the directory to be created. This directory acts as the **mount point**, where the Amazon EFS file system will be attached and accessed. |
 ---
 
 ## Why is this step required?
@@ -1246,12 +1282,40 @@ Replace `<EFS-DNS-NAME>` with your actual Amazon EFS DNS name.
 ```bash
 sudo mount -t nfs4 -o nfsvers=4.1 <EFS-DNS-NAME>:/ /efs
 ```
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because mounting a file system is a system-level operation. |
+| `mount` | Linux command used to attach a file system to a directory (mount point) so that its contents can be accessed. |
+| `-t` | Specifies the **type of file system** being mounted. |
+| `nfs4` | Indicates that the file system type is **Network File System version 4 (NFSv4)**. Amazon EFS supports NFS version 4.1. |
+| `-o` | Specifies additional **mount options** that control how the file system is mounted. |
+| `nfsvers=4.1` | Instructs the mount command to use **NFS version 4.1**, which is the supported protocol version for Amazon EFS. |
+| `<EFS-DNS-NAME>:/` | The DNS name of your Amazon EFS file system followed by `:/`, which represents the **root directory** of the EFS file system. Example: `fs-1234567890abcdef0.efs.ap-south-1.amazonaws.com:/` |
+| `/efs` | The local **mount point** on the EC2 instance where the Amazon EFS file system will be attached and accessed. |
 
 Example:
 
 ```bash
 sudo mount -t nfs4 -o nfsvers=4.1 fs-1234567890abcdef0.efs.ap-south-1.amazonaws.com:/ /efs
 ```
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because mounting a file system is a system-level operation. |
+| `mount` | Linux command used to attach a file system to a directory (mount point) so that its contents can be accessed. |
+| `-t` | Specifies the **type of file system** being mounted. |
+| `nfs4` | Indicates that the file system type is **Network File System version 4 (NFSv4)**. Amazon EFS uses the NFSv4.1 protocol. |
+| `-o` | Specifies additional **mount options** that control how the file system should be mounted. |
+| `nfsvers=4.1` | Instructs the `mount` command to use **NFS version 4.1**, which is the supported protocol version for Amazon EFS. |
+| `fs-1234567890abcdef0` | The unique **File System ID** assigned to your Amazon EFS file system by AWS. Every EFS file system has a unique ID. |
+| `.efs` | Indicates that the endpoint belongs to the **Amazon Elastic File System (EFS)** service. |
+| `ap-south-1` | The **AWS Region** where the EFS file system is created. In this example, it is the **Asia Pacific (Mumbai)** Region. |
+| `amazonaws.com` | The official AWS domain used to access AWS services. |
+| `:/` | Refers to the **root directory** of the Amazon EFS file system that will be mounted. |
+| `/efs` | The local **mount point** (directory) on the EC2 instance where the Amazon EFS file system will be attached and accessed. |
 
 ---
 
@@ -1288,6 +1352,20 @@ Ubuntu will not have access to the shared file system.
 ```bash
 sudo mount -t nfs4 -o nfsvers=4.1 <EFS-DNS-NAME>:/ /efs
 ```
+
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because mounting a file system is a system-level operation. |
+| `mount` | Linux command used to attach a file system to a directory (mount point) so that its contents can be accessed. |
+| `-t` | Specifies the **type of file system** being mounted. |
+| `nfs4` | Indicates that the file system type is **Network File System version 4 (NFSv4)**. Amazon EFS uses the NFSv4.1 protocol. |
+| `-o` | Specifies additional **mount options** that control how the file system should be mounted. |
+| `nfsvers=4.1` | Instructs the `mount` command to use **NFS version 4.1**, which is the supported protocol version for Amazon EFS. |
+| `<EFS-DNS-NAME>` | A placeholder for the **DNS name of your Amazon EFS file system**. Replace it with the actual DNS name provided by AWS, for example: `fs-1234567890abcdef0.efs.ap-south-1.amazonaws.com`. |
+| `:/` | Refers to the **root directory** of the Amazon EFS file system that will be mounted. |
+| `/efs` | The local **mount point** (directory) on the EC2 instance where the Amazon EFS file system will be attached and accessed. |
 
 ---
 
@@ -1361,6 +1439,16 @@ Open the `/etc/fstab` file.
 sudo nano /etc/fstab
 ```
 
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because the `/etc/fstab` system configuration file can only be modified by the root user. |
+| `nano` | A simple, terminal-based **text editor** used to create and edit text files directly from the command line. |
+| `/etc/fstab` | The **File Systems Table (fstab)** configuration file. It stores information about file systems that should be automatically mounted during system boot, including their mount points and mount options. |
+
+---
+
 Add the following line at the end of the file.
 
 Replace `<EFS-DNS-NAME>` with your actual Amazon EFS DNS name.
@@ -1369,6 +1457,20 @@ Replace `<EFS-DNS-NAME>` with your actual Amazon EFS DNS name.
 <EFS-DNS-NAME>:/ /efs nfs4 defaults,_netdev 0 0
 ```
 
+### Configuration Breakdown
+
+| Configuration Part | Explanation |
+|--------------------|-------------|
+| `<EFS-DNS-NAME>:/` | A placeholder for the **DNS name of your Amazon EFS file system** followed by `:/`, which represents the **root directory** of the EFS file system to be mounted. |
+| `/efs` | The local **mount point** (directory) on the EC2 instance where the Amazon EFS file system will be mounted and accessed. |
+| `nfs4` | Specifies that the file system type is **Network File System version 4 (NFSv4)**, which is the protocol used by Amazon EFS. |
+| `defaults` | Applies the default mount options, including `rw` (read/write), `suid`, `dev`, `exec`, `auto`, `nouser`, and `async`, which are suitable for most file systems. |
+| `_netdev` | Indicates that this is a **network-based file system**. During system boot, Linux waits until the network is available before attempting to mount the file system, preventing mount failures. |
+| `0` (5th field) | Controls the **dump** backup utility. A value of `0` means the file system will **not** be included in dump backups. |
+| `0` (6th field) | Controls the **fsck (File System Check)** order during boot. A value of `0` means Linux will **not** perform a filesystem consistency check on this network file system during startup. |
+
+---
+
 Save and exit the editor.
 
 To verify the configuration without rebooting, run:
@@ -1376,6 +1478,14 @@ To verify the configuration without rebooting, run:
 ```bash
 sudo mount -a
 ```
+
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because mounting file systems is a system-level operation. |
+| `mount` | Linux command used to attach one or more file systems to their respective mount points. |
+| `-a` | **All**. Tells the `mount` command to mount **all file systems** listed in the `/etc/fstab` file that are not currently mounted (except those marked with the `noauto` option). This is commonly used to verify that new `/etc/fstab` entries are correct without rebooting the system. |
 
 ---
 
@@ -1510,6 +1620,15 @@ Run the following command on **all three EC2 instances**.
 df -h
 ```
 
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `df` | **Disk Free**. Displays information about mounted file systems, including their total size, used space, available space, and mount points. |
+| `-h` | **Human-readable**. Displays disk sizes in an easy-to-read format such as **KB**, **MB**, **GB**, or **TB** instead of showing sizes only in bytes. |
+
+----
+
 ## Expected Output
 
 The output should contain a line similar to the following:
@@ -1540,6 +1659,18 @@ Create a file inside the mounted EFS directory.
 ```bash
 echo "Created from Ubuntu" | sudo tee /efs/ubuntu.txt
 ```
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `echo` | Displays the specified text on the terminal's standard output (stdout). |
+| `"Created from Ubuntu"` | The text string that `echo` outputs. In this assignment, it is the content that will be written to the file. |
+| `\|` | **Pipe operator**. Sends the output of the command on the left (`echo`) as the input to the command on the right (`tee`). |
+| `sudo` | **SuperUser DO**. Executes the `tee` command with administrator (root) privileges, ensuring it has permission to write to the mounted EFS directory if required. |
+| `tee` | Reads input from standard input (stdin) and writes it to the specified file while also displaying the same content on the terminal. |
+| `/efs/ubuntu.txt` | The file that will be created (or overwritten if it already exists) inside the mounted Amazon EFS file system. Since `/efs` is the EFS mount point, the file is stored on the shared EFS storage and becomes accessible from all connected EC2 instances. |
+
+---
 
 ## Expected Output
 
@@ -1566,6 +1697,17 @@ List the contents of the mounted directory.
 ```bash
 ls -l /efs
 ```
+
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `ls` | **List**. Displays the files and directories present in the specified location. |
+| `-l` | **Long listing format**. Shows detailed information for each file or directory, including file permissions, number of links, owner, group, file size, last modification date and time, and file name. |
+| `/efs` | The directory being listed. In this assignment, `/efs` is the **mount point** where the Amazon EFS file system is mounted, so the command displays all files and folders stored in the shared EFS file system. |
+
+---
+
 
 ## Expected Output
 
@@ -1697,6 +1839,14 @@ Run the following command on all three EC2 instances.
 ```bash
 sudo umount /efs
 ```
+
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `sudo` | **SuperUser DO**. Executes the command with administrator (root) privileges because unmounting a file system is a system-level operation. |
+| `umount` | **Unmount**. Detaches a mounted file system from its mount point, making it no longer accessible through that directory. *(The command is spelled `umount`, not `unmount`.)* |
+| `/efs` | The **mount point** from which the Amazon EFS file system will be detached. After unmounting, the `/efs` directory remains on the EC2 instance, but it will no longer provide access to the Amazon EFS file system. |
 
 ---
 
