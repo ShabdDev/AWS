@@ -745,11 +745,32 @@ Change the permission of the key file:
 chmod 400 Assignment-Key.pem
 ```
 
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `chmod` | **Change Mode**. Linux command used to change the permissions (access rights) of a file or directory. |
+| `400` | Sets the file permissions using **numeric (octal) notation**: <br>• **4 (Owner):** Read (`r`) permission only.<br>• **0 (Group):** No permissions (`---`).<br>• **0 (Others):** No permissions (`---`).<br><br>This results in the permission `-r--------`, meaning only the file owner can read the file. This is required by SSH for private key files. |
+| `Assignment-Key.pem` | The **private key file** (`.pem`) downloaded when the EC2 Key Pair was created. SSH uses this file to authenticate securely with the EC2 instance. |
+
+
 Connect to the Ubuntu instance:
 
 ```bash
 ssh -i Assignment-Key.pem ubuntu@<Ubuntu-Public-IP>
 ```
+
+### Command Breakdown
+
+| Command Part | Explanation |
+|-------------|-------------|
+| `ssh` | **Secure Shell (SSH)**. A secure network protocol and command-line utility used to remotely connect to another computer or server over an encrypted connection. |
+| `-i` | **Identity File**. Specifies the private key file that SSH should use for authentication instead of prompting for a password. |
+| `Assignment-Key.pem` | The **private key file** associated with the EC2 Key Pair. It proves your identity and is required to authenticate with the EC2 instance. |
+| `ubuntu` | The **default login username** for Ubuntu EC2 instances. Different Linux distributions have different default usernames (for example, `ec2-user` for Amazon Linux 2 and most RHEL AMIs). |
+| `@` | Separates the **username** from the **host (server)** you want to connect to. Its general format is `username@hostname` or `username@IP-address`. |
+| `<Ubuntu-Public-IP>` | A placeholder for the **Public IPv4 address** of your Ubuntu EC2 instance. Replace it with the actual public IP assigned to the instance, for example: `13.233.45.120`. |
+
 
 Replace `<Ubuntu-Public-IP>` with the Public IPv4 address of your Ubuntu instance.
 
