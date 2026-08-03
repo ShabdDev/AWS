@@ -2218,7 +2218,17 @@ Although these networking resources do not usually incur charges, leaving unused
       └── Future Application Subnet
           10.0.4.0/24
      ```
-
+ 7. Why do we need a VPC if we already have a Security Group?
+   - A VPC provides the network infrastructure (IP addresses, subnets, routing, and connectivity),
+   - while a Security Group acts as a virtual firewall that controls inbound and outbound traffic for resources inside that VPC.
+   - A Security Group cannot replace a VPC because it provides security, not networking.
+   - if you remove security group network still exists only filtering is stopped
+   - if you remove VPC following questions will appear:
+   -  - Where are the IP addresses?
+      - Which subnet are they in?
+      - Which Route Table do they use?
+      - Which Internet Gateway connects them?
+      - How does EFS know where Ubuntu is?
 
 
 
