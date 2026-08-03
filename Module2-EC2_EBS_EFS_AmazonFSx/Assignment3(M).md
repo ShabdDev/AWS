@@ -2229,6 +2229,87 @@ Although these networking resources do not usually incur charges, leaving unused
       - Which Route Table do they use?
       - Which Internet Gateway connects them?
       - How does EFS know where Ubuntu is?
+  8. If the VPC already provides IP addresses, why do we need Subnets? Who made them mandatory, and why?
+    - A VPC defines the overall network,
+    - while subnets divide that network into smaller segments.
+    - AWS requires every resource to be launched inside a subnet because routing, Availability Zone placement, and many networking configurations are managed at the subnet level, enabling better organization, security, and scalability.
+    - 1. IP Address Allocation
+         - Every resource gets its private IP address from the subnet's CIDR block.
+         - Without a subnet, AWS doesn't know which IP range to assign.
+    - 2. Availability Zone (AZ) 
+         - A subnet belongs to exactly one Availability Zone.
+         - An EC2 instance launched in a subnet is automatically launched in that subnet's AZ.
+         - A subnet cannot span multiple Availability Zones.
+    - 3. Route Table Association 
+         - A Route Table is associated with a subnet, not directly with an EC2 instance.
+         - Every resource inside that subnet follows the same routing rules.
+    - 4. Public vs Private Network 
+         - Whether a resource is public or private depends largely on the subnet's routing.
+         - The subnet determines whether Internet access is possible.
+    - 5. NAT Gateway 
+         - A NAT Gateway must be placed in a public subnet.
+         - Private subnet resources use it to access the Internet without exposing themselves to inbound Internet traffic. 
+    - 6. EFS Mount Targets 
+         - Amazon EFS requires Mount Targets, and each Mount Target is created in a subnet.
+         - Without a subnet, the Mount Target cannot exist.
+    - 7. Load Balancers
+         - Application Load Balancers (ALB) and Network Load Balancers (NLB) are associated with one or more subnets.
+         - For high availability, AWS recommends placing the load balancer in subnets across multiple Availability Zones.
+    - 8. RDS (Databases)
+         - Amazon RDS uses a DB Subnet Group, which contains subnets from different Availability Zones.
+         - This enables Multi-AZ deployments and automatic failover.
+    - 9. Lambda (VPC Mode) 
+         - When you configure an AWS Lambda function to run inside a VPC, you must select one or more subnets.
+         - AWS creates Elastic Network Interfaces (ENIs) in those subnets so the Lambda function can access private resources.
+    - 10. Auto Scaling Groups
+         - An Auto Scaling Group launches EC2 instances into the subnets you specify.
+         - This spreads instances across multiple Availability Zones for resilience.
+    - 11. ECS / EKS (Containers)
+         - Container services such as Amazon ECS and Amazon EKS deploy tasks or pods into selected subnets.
+    - 12. VPC Endpoints 
+         - Some VPC Endpoints are created within specific subnets to provide private access to AWS services without traversing the Internet.
+
+9. Public Subnet
+  - Definition
+  - A Public Subnet is a subnet whose Route Table contains a route to an Internet Gateway (IGW).
+  - This means resources in the subnet can have Internet connectivity (provided they also have a public IP).
+  - ```
+    Destination        Target
+    10.0.0.0/16        Local
+    0.0.0.0/0          Internet Gateway
+    ```
+10. Private Subnet
+  - Definition
+  - A Private Subnet is a subnet whose Route Table does NOT contain a route to an Internet Gateway.
+  - Resources in this subnet cannot be reached directly from the Internet.
+  - ```
+    Destination        Target
+    10.0.0.0/16        Local
+    ```
+11. Can a Public Subnet Contain a Private EC2? 
+  - Yes.
+  - Auto Assign Public IP = Disabled
+  - It cannot be reached directly from the Internet because it has no public IP, even though it is in a public subnet.
+    
+12. Can a Private Subnet Contain a Public EC2?
+  - NO
+    
+13. Then why do we say the Route Table has an "outbound" route?
+  - A Route Table is used when a resource needs to decide where to send outgoing packets.  
+  - ```
+    EC2 wants to reach 8.8.8.8
+    ↓
+    Route Table checks:
+    Destination: 0.0.0.0/0
+    ↓
+    Send to Internet Gateway
+    ```
+  - The return traffic comes back through the Internet Gateway because:
+  - The Internet Gateway supports bidirectional communication.
+  - Security Groups are stateful, so responses to allowed connections are automatically permitted.
+    
+
+
 
 
 
