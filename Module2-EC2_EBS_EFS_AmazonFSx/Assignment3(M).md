@@ -2013,9 +2013,7 @@ Delete the resources in the following order:
 ## Why is this required?
 
 AWS networking resources have dependencies.
-
 For example, a VPC cannot be deleted while it still contains subnets or has an attached Internet Gateway.
-
 Deleting resources in the correct order avoids dependency errors.
 
 ---
@@ -2023,3 +2021,222 @@ Deleting resources in the correct order avoids dependency errors.
 ## What happens if this resource is not deleted?
 
 Although these networking resources do not usually incur charges, leaving unused resources can clutter your AWS account and make future networking configurations more difficult.
+
+---
+## Interview Questions
+
+1. VPC (Virtual Private Cloud)
+   - It is isolated virtual network within AWS 
+   - Your own private network
+   - Resources within this VPC can communicate with each other unless you explicitly allow external access.
+   - Everything we created (EC2 instances, EFS, Security Groups, and Subnet) exists inside this VPC in this Assignment.
+     
+2. Subnet
+   - Smaller network created by dividing VPC into multiple Ip address ranges.
+   - all the resources in this assignment must be created inside subnet
+   - Subnet decide how resources can communicate with each other and with internet
+     
+3. Route Table
+   - Route Table is a set of routing rules(routes) decides where the n/w traffic should be sent from subnet
+   - when EC2 instance sends data AWS checks route table associated with its subnet
+   - ```
+      Destination      Target
+      10.0.0.0/16      Local
+      0.0.0.0/0        Internet Gateway
+     ```
+   - Traffic destined for 10.0.0.0/16 should be stays within VPC
+   - Traffic destined for 0.0.0.0/0  should be sent over internet through the internet gateway
+
+4. Internet Gateway
+   - Aws managed n/w component which connects VPC to public internet.
+   - EC2 in public subnet can send and receive the data from internet.
+   - EC2 having public Ip addresses can not access internet without internet Gateway.
+   - The Internet Gateway allowed us to:
+     - SSH into the EC2 instances.
+     - Download software packages (nfs-common, nfs-utils).
+
+5. Security Group
+   - A Security Group acts as a virtual firewall for AWS resources.
+   - It controls inbound (incoming) and outbound (outgoing) traffic.
+   - It is stateful, meaning return traffic is automatically allowed.
+   ```
+   Example 1: SSH Connection (Inbound + Automatic Response)
+                    Inbound
+    Your Laptop  --------------------->  EC2 Instance
+                 SSH Request (Port 22)
+    
+                     Outbound (Automatic Response)
+    Your Laptop  <---------------------  EC2 Instance
+                  SSH Response
+    
+    ✓ Allowed because Security Groups are Stateful.
+    No separate outbound rule is required for the response.
+
+   Example 2: sudo apt update (Outbound + Automatic Response)
+
+                     Outbound
+    EC2 Instance  --------------------->  Ubuntu Package Repository
+                  Package Request
+    
+                      Inbound (Automatic Response)
+    EC2 Instance  <---------------------  Ubuntu Package Repository
+                  Package List / Updates
+    
+    ✓ Allowed because Security Groups are Stateful.
+    No separate inbound rule is required for the response.
+
+   ## Easy way to remember
+     If EC2 starts the communication
+        ↓
+    Outbound Rule is checked
+        ↓
+    Response comes back automatically
+    (Stateful Security Group)
+    
+    
+    If Someone starts the communication with EC2
+        ↓
+    Inbound Rule is checked
+        ↓
+    Response goes back automatically
+    (Stateful Security Group)
+   ```
+   - It works at the instance/resource level, not at the subnet level.
+   - By default:
+   - All inbound traffic is denied.
+   - All outbound traffic is allowed (unless you modify the default outbound rule).
+   - A Security Group contains only Allow rules;
+   - it does not support explicit Deny rules. Any traffic not explicitly allowed is implicitly denied.
+
+7. CIDR(Class-less inter-domain routing)
+   - Notation used to define range of IP addresses for n/w
+   - 1 by 1 assigning IP to servers is not possible as it varies time to time
+   - Reserving IP address range is solution to this.
+   - 10.0.0.0/16
+   - 10.0.0.0 = n/w bits (fixed)
+   - /16 = Prefix length
+   - An IPv4 address has 4 octets, and each octet must contain exactly 8 bits.
+   - ```
+      | Division | Quotient | Remainder |
+      | -------- | -------- | --------- |
+      | 10 ÷ 2   | 5        | 0         | ← Least Significant Bit (LSB) (the rightmost bit).
+      | 5 ÷ 2    | 2        | 1         |
+      | 2 ÷ 2    | 1        | 0         |
+      | 1 ÷ 2    | 0        | 1         | ← Most Significant Bit (MSB) (the leftmost bit).
+
+     ```
+    - so our address will look like below (10.0.0.0/16)
+    - 00001010.00000000.00000000.00000000
+    - 00001010.00000000 = n/w bits
+    - 00000000.00000000 = Host bits(varies) (32 - 16 = 16) [range will be 2^16 = 65536 available addresses can be created]
+    - The VPC defines the entire address space:
+    - Total IP addresses = 65,536 (10.0.0.0 to 10.0.255.255)
+    - However, you cannot launch EC2 instances directly into a VPC. They must be launched into a subnet.
+    - So the 65,536 addresses are simply the pool of addresses available to create subnets from.
+    - AWS reserves 5 IP addresses in every subnet for its own networking functions.
+    - ```
+      Example
+
+      Suppose you create this VPC:
+      
+      VPC: 10.0.0.0/16
+      
+      Now create these subnets:
+      
+      Subnet A: 10.0.1.0/24
+      Subnet B: 10.0.2.0/24
+      Subnet C: 10.0.3.0/24
+      
+      Each /24 subnet contains:
+      
+      Total IPs = 256
+      AWS reserves 5
+      Usable = 251
+      
+      So:
+      
+      Subnet A → 251 usable IPs
+      Subnet B → 251 usable IPs
+      Subnet C → 251 usable IPs
+      
+      The remaining address space in the VPC (for example, 10.0.4.0/24, 10.0.5.0/24, etc.) is still available for creating        more subnets.
+      
+      If you create a /20 subnet instead
+      
+      A /20 subnet has:
+      
+      Host bits = 12
+      Total IPs = 2¹² = 4,096
+      AWS reserves 5
+      Usable = 4,091
+      ```
+   - Subnet: 10.0.1.0/24
+   - ```
+     | IP Address    | Reserved For                                                                                |
+     | --------------| --------------------------------------------------------------------------------------------|
+     | **10.0.1.0**  | **Network address** (identifies the subnet itself)                                          |
+     | **10.0.1.1**  | **VPC Router** (default gateway for instances in the subnet)                                |
+     | **10.0.1.2**  | **Amazon-provided DNS server**                                                              |
+     | **10.0.1.3**  | **Reserved for future AWS use**                                                             |
+     | **10.0.1.255**| *Broadcast address*(reserved by AWS, even though AWS VPC doesn't support traditional IP broadcasts)|
+
+     ```
+   - 1. Network Address (10.0.1.0)
+        - This identifies the subnet itself.
+        - Think of it like a street name rather than a house number—you don't assign it to a device.
+     2. VPC Router (10.0.1.1)
+        - Every EC2 instance uses this as its default gateway.
+        - This router is managed by AWS. You never create or configure it yourself.
+     3. Amazon DNS (10.0.1.2)
+        - This is the DNS resolver provided by AWS.
+        - When your EC2 instance looks up a hostname like:
+        - amazon.com
+        - or resolves private AWS names, the request is typically handled through the Amazon-provided DNS service. 
+     4. Reserved for Future Use (10.0.1.3)
+       - AWS keeps this address for internal purposes and future networking features. Customers cannot assign it.
+     5. Last Address (10.0.1.255)
+       - In traditional IPv4 networking, this is the broadcast address.
+       - AWS VPC does not support broadcast traffic, but it still reserves this address, so you can't assign it to an instance.
+      ###
+     ```
+     Assignment-VPC
+      CIDR: 10.0.0.0/16
+      │
+      ├── Public Subnet
+      │   10.0.1.0/24
+      │      ├── Ubuntu EC2
+      │      ├── RHEL EC2
+      │      ├── Amazon Linux 2 EC2
+      │      └── EFS Mount Target
+      │
+      ├── Future Private Subnet
+      │   10.0.2.0/24
+      │
+      ├── Future Database Subnet
+      │   10.0.3.0/24
+      │
+      └── Future Application Subnet
+          10.0.4.0/24
+     ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
