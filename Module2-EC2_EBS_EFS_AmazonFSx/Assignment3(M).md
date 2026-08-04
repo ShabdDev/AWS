@@ -2203,6 +2203,50 @@ Although these networking resources do not usually incur charges, leaving unused
    - A Security Group contains only Allow rules;
    - it does not support explicit Deny rules. Any traffic not explicitly allowed is implicitly denied.
 
+ 10. Network ACL (Network Access Control List)
+	- Definition
+      - A Network ACL (NACL) is an optional, 
+	    - stateless firewall that controls inbound and outbound traffic at the subnet level.
+      - Unlike a Security Group, which protects individual resources (such as EC2 or EFS), 
+	    - a Network ACL protects the entire subnet.
+	  
+      - If the NACL says: Allow SSH (22)
+	    - then all EC2 instances in that subnet can receive SSH traffic (subject to their Security Groups).
+	  
+      - If the NACL blocks SSH: Deny SSH
+	    - then none of the EC2 instances in that subnet can receive SSH traffic, even if their Security Groups allow it.
+	  
+	  - Security Group : Stateful
+	    - If the request is allowed,
+        - the response is automatically allowed.
+        - You do not need another rule.
+		
+      - Network ACL : Stateless
+	    - If you allow only the inbound request,
+		  - the response will still be blocked.
+		  - You must explicitly allow:
+		  - Inbound
+		  - Outbound
+	
+	  - Security Group Example
+	    - Inbound - Allow SSH
+		  - No outbound rule required for the response.
+      - AWS automatically allows it because Security Groups are stateful.
+
+	  - NACL Example
+	    - Inbound - Allow SSH
+		  - Allow Ephemeral Ports
+		  - Both rules are required.
+		
+	  - Allow and Deny
+	    - Security Group => supports Allow only 
+	    - Everything else is automatically denied
+	
+	    - Network ACL => Allow, Deny
+	  	- You can block a specific IP address using a NACL.
+		  - You cannot do this with a Security Group.
+		  - Default NACL: Inbound => Allow All, Outbound => Allow All
+
 7. CIDR(Class-less inter-domain routing)
    - Notation used to define range of IP addresses for n/w
    - 1 by 1 assigning IP to servers is not possible as it varies time to time
