@@ -2207,6 +2207,31 @@ Although these networking resources do not usually incur charges, leaving unused
 	- Definition
       - A Network ACL (NACL) is an optional, 
 	    - stateless firewall that controls inbound and outbound traffic at the subnet level.
+        - When you create a VPC, AWS automatically creates a Default Network ACL.
+        - By default, it is associated with all new subnets.
+        - Default NACL Default rules
+        - ```
+            | Direction | Rule      |
+			| --------- | --------- |
+			| Inbound   | Allow All |
+			| Outbound  | Allow All |
+          ```
+        - Custom NACL
+        - ```
+            | Direction | Rule      |
+			| --------- | --------- |
+			| Inbound   | Deny All |
+			| Outbound  | Deny All |
+          ```
+         - ```    			
+					        ┌──────────────┬──────────────┐
+					        │              │              │
+					 Public Subnet    App Subnet     DB Subnet
+					        │              │              │
+					        └─────── Public-NACL ─────────┘
+           ```
+         - Internet -> Internet Gateway -> NAT Gateway -> NACL -> EC2
+         - If the inbound rule blocks the response, the packet is dropped. Even though the NAT Gateway worked correctly.
       - Unlike a Security Group, which protects individual resources (such as EC2 or EFS), 
 	    - a Network ACL protects the entire subnet.
 	  
@@ -2365,7 +2390,6 @@ Although these networking resources do not usually incur charges, leaving unused
       - How does EFS know where Ubuntu is?
         
 
-
 9. Public Subnet
   - Definition
   - A Public Subnet is a subnet whose Route Table contains a route to an Internet Gateway (IGW).
@@ -2404,7 +2428,12 @@ Although these networking resources do not usually incur charges, leaving unused
   - The return traffic comes back through the Internet Gateway because:
   - The Internet Gateway supports bidirectional communication.
   - Security Groups are stateful, so responses to allowed connections are automatically permitted.
-    
+
+15. Security Group asks "Can this EC2 communicate?"
+Network ACL asks "Can this subnet communicate?"
+Route Table asks "Where should the packet go?"
+NAT Gateway says "I'll translate the private IP to a public IP."
+Internet Gateway says "I'll connect the VPC to the Internet."
 
 
 
