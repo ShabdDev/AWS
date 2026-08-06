@@ -152,19 +152,14 @@
 - Amazon EFS Misconceptions
 - AWS Networking Misconceptions
 
----
-
-# AWS Networking, EC2 & Amazon EFS Interview Handbook
 
 ---
 
-# AWS Networking, Amazon EC2 & Amazon EFS Interview Handbook
-
----
 
 ⭐Mind Map
-EC2 + EFS Assignment
 
+EC2 + EFS Assignment
+```
         AWS
          │
          ▼
@@ -205,11 +200,11 @@ EC2 + EFS Assignment
         │
         ▼
       NFS 4.1
-
+```
 ---
 
 ⭐ Component relationship
-
+```
 AMI
  ↓
 Creates
@@ -241,11 +236,11 @@ Accesses
 Mount Target
  ↓
 Amazon EFS
-
+```
 ---
 
 ⭐ Production Architecture ⭐
-
+```
 Internet
 
 ↓
@@ -267,7 +262,7 @@ Amazon EFS
 ↓
 
 Amazon RDS
-
+```
 ---
 
 ⭐ Rapid Fire (30 Seconds Revision) ⭐
@@ -309,44 +304,11 @@ Amazon RDS
 
 ---
 
-## Prerequisites
-
-None
-
-This is the first concept of computer networking.
-
----
-
 ## Definition
 
 A **Network** is a collection of **two or more devices** connected together to **communicate** and **share resources** using standard networking protocols.
 
 The devices can be physical or virtual.
-
-Examples include:
-
-- Computers
-- Servers
-- Mobile Phones
-- Routers
-- Switches
-- Cloud Resources (Amazon EC2, Amazon EFS)
-
----
-
-## Why Do We Need It?
-
-Without a network:
-
-- Devices cannot communicate.
-- Files cannot be shared.
-- Internet cannot be accessed.
-- Applications cannot communicate.
-- Cloud services like AWS cannot function.
-
-A network provides a communication path that allows devices to exchange information efficiently.
-
----
 
 ## Quick Revision
 
@@ -355,7 +317,7 @@ A network provides a communication path that allows devices to exchange informat
 | **Purpose** | Communication and Resource Sharing |
 | **Communication Medium** | Wired or Wireless |
 | **Uses** | File Sharing, Remote Access, Internet, Cloud Computing |
-| **Examples** | Home Wi-Fi, Office LAN, Internet, AWS VPC |
+| **Examples** | Home Wi-Fi, Office LAN, Internet, AWS VPC, Router, Switches |
 
 ---
 
