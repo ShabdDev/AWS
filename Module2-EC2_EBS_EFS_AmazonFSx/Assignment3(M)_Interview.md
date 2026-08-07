@@ -239,49 +239,23 @@ Amazon EFS
 ```
 ---
 
-⭐ Production Architecture ⭐
-```
-Internet
-
-↓
-
-Application Load Balancer
-
-↓
-
-Public Subnet
-
-↓
-
-Private EC2
-
-↓
-
-Amazon EFS
-
-↓
-
-Amazon RDS
-```
----
-
 ⭐ Rapid Fire (30 Seconds Revision) ⭐
 
-| Question     | Answer                |
-| ------------ | --------------------- |
-| EC2          | Virtual Machine       |
-| VPC          | Virtual Network       |
-| Subnet       | Network Division      |
-| ENI          | Virtual NIC           |
-| EBS          | Block Storage         |
-| EFS          | Shared File Storage   |
-| SG           | Stateful Firewall     |
-| NACL         | Stateless Firewall    |
-| IGW          | Internet Access       |
-| NAT          | Outbound Internet     |
-| Mount Target | EFS Network Endpoint  |
-| NFS          | File Sharing Protocol |
-| Port         | 2049                  |
+| Question                       | Answer                |
+| ------------------------------ | --------------------- |
+| EC2                            | Virtual Machine       |
+| VPC                            | Virtual Network       |
+| Subnet                         | Network Division      |
+| ENI                            | Virtual NIC           |
+| EBS                            | Block Storage         |
+| EFS                            | Shared File Storage   |
+| SG                             | Stateful Firewall     |
+| NACL                           | Stateless Firewall    |
+| IGW                            | Internet Access       |
+| NAT(n/w Address Translation)   | Outbound Internet     |
+| Mount Target                   | EFS Network Endpoint  |
+| NFS                            | File Sharing Protocol |
+| Port                           | 2049                  |
 
 ---
 # Section 1 – Networking Fundamentals
@@ -6929,6 +6903,14 @@ Security is controlled by Security Groups and Network ACLs.
 
 A **NAT (Network Address Translation) Gateway** is an **AWS-managed service** that enables resources in a **Private Subnet** to **access the Internet** while preventing the Internet from initiating connections to those resources.
 
+NFS is a general network file-sharing protocol used by many systems (including on-premises servers and cloud storage), and Amazon EFS is just one service that uses NFS.
+
+NFS (Network File System) – A protocol for sharing files over a network.
+EFS (Elastic File System) – Amazon Web Services' (AWS) managed NFS-based file storage service.
+NAS (Network Attached Storage) – A dedicated device for storing and sharing files over a network.
+HPC (High-Performance Computing) – Systems designed for computationally intensive workloads.
+ESXi (Elastic Sky X Integrated) – VMware's bare-metal hypervisor for running virtual machines.
+PV (Persistent Volume) – A Kubernetes storage resource that persists independently of pods.
 It provides **outbound Internet access only**.
 
 ---
