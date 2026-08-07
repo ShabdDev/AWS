@@ -833,33 +833,21 @@ All four layers are used while connecting to EC2 through SSH and mounting Amazon
 
 An **IP (Internet Protocol) Address** is a **unique logical address** assigned to a device on a network.
 
-It identifies **where a device is located** on the network so that data can be sent to the correct destination.
+It identifies **where a device is located on the network** so that data can be sent to the correct destination.
 
 Every device that communicates over a network requires an IP address.
 
 ---
 
-## Why Do We Need an IP Address?
-
-Without an IP address:
-
-- Devices cannot be uniquely identified.
-- Data cannot reach the intended destination.
-- Communication between devices is impossible.
-
-An IP address acts like the **address of a house**, allowing data to be delivered to the correct device.
-
----
-
 ## Quick Revision
 
-| Item | Description |
-|------|-------------|
-| **Purpose** | Identifies a device on a network |
-| **Address Type** | Logical Address |
-| **Assigned By** | Network Administrator, ISP, DHCP Server, or AWS |
-| **Used For** | Device Identification and Routing |
-| **TCP/IP Layer** | Internet Layer |
+| Item                | Description                                     |
+|---------------------|-------------------------------------------------|
+| **Purpose**         | Identifies a device on a network                |
+| **Address Type**    | Logical Address                                 |
+| **Assigned By**     | Network Administrator, ISP, DHCP Server, or AWS |
+| **Used For**        | Device Identification and Routing               |
+| **TCP/IP Layer**    | Internet Layer                                  |
 
 ---
 
@@ -875,6 +863,79 @@ An IP address acts like the **address of a house**, allowing data to be delivere
 
 ---
 
+# DevOps IP Address Cheat Sheet
+
+## Common IP Address Ranges
+
+| IP Address / Range | Name | Purpose | Example |
+|--------------------|------|---------|---------|
+| `127.0.0.1` | **Loopback** | Refers to the same machine (localhost). | `ping 127.0.0.1` |
+| `0.0.0.0` | **Any Address** | Listen on all network interfaces or represent the default route. | `nginx` listening on `0.0.0.0:80` |
+| `255.255.255.255` | **Limited Broadcast** | Broadcast packet to every device on the local network. | **DHCP (Dynamic Host Configuration Protocol)** discovery |
+| `169.254.0.0/16` | **APIPA (Automatic Private IP Addressing)** | Automatically assigned when **DHCP** fails. | `169.254.25.10` |
+| `10.0.0.0/8` | **Private Network** | Large enterprise networks and **AWS VPC (Virtual Private Cloud)**. | `10.0.1.15` |
+| `172.16.0.0/12` | **Private Network** | Medium-sized private networks. | `172.31.20.5` |
+| `192.168.0.0/16` | **Private Network** | Home, office, and lab networks. | `192.168.29.101` |
+| `224.0.0.0 - 239.255.255.255` | **Multicast** | One-to-many communication. | Video streaming, routing protocols |
+| `240.0.0.0 - 255.255.255.254` | **Reserved** | Reserved for future use. | Rarely used |
+| Public IP | **Internet-Routable IP** | Reachable from the Internet. | `3.108.x.x` (AWS EC2) |
+
+---
+
+# Common DevOps Networking Examples
+
+| Service | Typical IP Address |
+|---------|--------------------|
+| Ubuntu Virtual Machine | `192.168.x.x` |
+| VMware **NAT (Network Address Translation)** Network | `192.168.x.x` |
+| VMware Host-Only Network | `192.168.x.x` |
+| AWS Private **EC2 (Elastic Compute Cloud)** Instance | `10.x.x.x`, `172.31.x.x`, or `192.168.x.x` |
+| AWS Public EC2 Instance | Public IP + Private IP |
+| Kubernetes Pod | `10.x.x.x` (depends on the **CNI (Container Network Interface)** plugin) |
+| Docker Bridge Network | `172.17.0.x` (default) |
+
+---
+
+# IP Addresses Every DevOps Engineer Should Remember
+
+| IP Address | Why It Is Important |
+|------------|---------------------|
+| `127.0.0.1` | Localhost (Loopback) |
+| `0.0.0.0` | Listen on all network interfaces |
+| `10.0.0.0/8` | Common AWS and enterprise private network |
+| `172.16.0.0/12` | Private network range |
+| `192.168.0.0/16` | Home, office, and lab networks |
+| `169.254.169.254` | **AWS EC2 Instance Metadata Service (IMDS)** |
+| `169.254.x.x` | **APIPA** address when DHCP fails |
+| `255.255.255.255` | Limited broadcast address |
+
+---
+
+# AWS Special IP Address
+
+The following IP address is one of the most important for AWS DevOps engineers.
+
+```bash
+curl http://169.254.169.254/latest/meta-data/
+```
+
+This command accesses the **EC2 Instance Metadata Service (IMDS)** and returns information about the running instance.
+
+## Information Available from IMDS
+
+| Information | Description |
+|------------|-------------|
+| Instance ID | Unique ID of the EC2 instance |
+| Private IP | Internal IP address assigned to the instance |
+| Public IP | Internet-facing IP address (if assigned) |
+| Availability Zone | AWS Availability Zone where the instance is running |
+| IAM (Identity and Access Management) Role | IAM role attached to the EC2 instance |
+| AMI (Amazon Machine Image) ID | ID of the AMI used to launch the instance |
+| Hostname | Internal hostname of the EC2 instance |
+
+> **Interview Tip:** The IP address `169.254.169.254` is frequently used in cloud-init scripts, Terraform, Ansible, shell scripts, and production automation to retrieve instance metadata dynamically.
+---
+
 ## Public IP vs Private IP
 
 | Public IP | Private IP |
@@ -883,75 +944,6 @@ An IP address acts like the **address of a house**, allowing data to be delivere
 | Accessible over the Internet | Not directly accessible from the Internet |
 | Assigned by ISP or AWS | Assigned within the private network or VPC |
 | Used for Internet communication | Used for internal communication |
-
----
-
-## How Does an IP Address Work?
-
-Suppose your laptop wants to connect to an EC2 instance.
-
-```text
-Laptop
-IP: 192.168.1.10
-        │
-        ▼
-Internet
-        │
-        ▼
-Public IP
-54.xx.xx.xx
-        │
-        ▼
-Ubuntu EC2
-```
-
-Your laptop sends data to the EC2 instance's **Public IP**.
-
-AWS then delivers the data to the correct EC2 instance.
-
----
-
-## How It Works Internally
-
-When you execute:
-
-```bash
-ssh -i Assignment-Key.pem ubuntu@54.xx.xx.xx
-```
-
-The SSH application passes the destination IP address to the **Internet Layer**.
-
-The Internet Layer uses this IP address to determine where the packet should be delivered.
-
-Routers on the Internet read the destination IP address and forward the packet until it reaches the AWS network and finally the EC2 instance.
-
----
-
-## Assignment Example
-
-This assignment uses two types of IP addresses.
-
-| Resource | IP Type | Purpose |
-|----------|---------|---------|
-| Your Laptop | Public / Private | Initiates the SSH connection |
-| Ubuntu EC2 | Public IP | Allows SSH access from your laptop |
-| Ubuntu EC2 | Private IP | Communicates with Amazon EFS |
-| RHEL EC2 | Private IP | Communicates with Amazon EFS |
-| Amazon Linux 2 EC2 | Private IP | Communicates with Amazon EFS |
-| Amazon EFS | Private IP | Shared storage inside the VPC |
-
----
-
-## Real DevOps Usage
-
-A DevOps Engineer uses IP addresses to:
-
-- Connect to servers using SSH.
-- Configure application communication.
-- Troubleshoot connectivity issues.
-- Configure DNS records.
-- Design VPCs and subnets.
-- Secure infrastructure using Security Groups and Network ACLs.
 
 ---
 
@@ -1062,10 +1054,6 @@ Amazon EFS communication occurs using **Private IP addresses** inside the VPC.
 
 > An IP (Internet Protocol) Address is a unique logical address that identifies a device on a network and enables data to be routed to the correct destination.
 ---
-
----
-
-# Q4. What are the Different Types of IP Addresses?
 
 ## Topic Information
 
