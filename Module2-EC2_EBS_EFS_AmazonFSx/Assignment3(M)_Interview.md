@@ -327,21 +327,8 @@ A network consists of multiple components working together.
 
 ## How Does a Network Work?
 
-A network works by allowing devices to exchange data using standard communication protocols.
-
-The communication process is:
-
-```text
-Device A
-    │
-    ▼
-Network
-    │
-    ▼
-Device B
-```
-
-Every device connected to the network has an identity (IP Address), and communication follows predefined networking protocols such as TCP/IP.
+- Every device connected to the network has an identity (IP Address),
+- communication follows predefined networking protocols such as TCP/IP.
 
 ---
 
@@ -413,23 +400,6 @@ Without networking, these resources cannot communicate.
 
 ---
 
-## Real DevOps Usage
-
-Networking is one of the most frequently used skills in DevOps.
-
-A DevOps Engineer uses networking to:
-
-- Connect applications to databases.
-- Connect application servers to shared storage.
-- Configure CI/CD servers.
-- Troubleshoot connectivity issues.
-- Secure cloud infrastructure.
-- Design scalable cloud architectures.
-
-Almost every production issue involves networking in some form.
-
----
-
 ## Production Usage
 
 In production environments, networks connect:
@@ -459,26 +429,45 @@ Amazon EC2 cannot communicate with Amazon EFS.
 
 ### Possible Causes
 
-| Possible Cause | Explanation |
-|---------------|-------------|
-| Different VPC | EC2 and EFS are not in the same VPC. |
-| Security Group | NFS Port `2049` is blocked. |
-| Network ACL | Traffic is denied. |
-| Route Table | Incorrect routing configuration. |
-| Mount Target | EFS Mount Target is unavailable. |
-| DNS Resolution | EFS DNS name cannot be resolved. |
+| Possible Cause | Explanation                          |
+|--------------- |--------------------------------------|
+| Different VPC  | EC2 and EFS are not in the same VPC. |
+| Security Group | NFS Port `2049` is blocked.          |
+| Network ACL    | Traffic is denied.                   |
+| Route Table    | Incorrect routing configuration.     |
+| Mount Target   | EFS Mount Target is unavailable.     |
+| DNS Resolution | EFS DNS name cannot be resolved.     |
 
----
+```
+# Check DNS resolution
+nslookup fs-xxxxxxxx.efs.ap-south-1.amazonaws.com
 
-## Interview Tip
+# Test NFS port
+nc -zv fs-xxxxxxxx.efs.ap-south-1.amazonaws.com 2049
 
-A network **only provides the communication path**.
+# Check installed NFS client
+rpm -qa | grep nfs-utils          # Amazon Linux / RHEL
+dpkg -l | grep nfs-common         # Ubuntu
 
-The communication rules are defined by networking protocols such as:
+# Check mounted file systems
+mount | grep efs
 
-- TCP
-- UDP
-- IP
+# View routing table
+ip route
+
+# Verify network connectivity
+ping fs-xxxxxxxx.efs.ap-south-1.amazonaws.com
+
+# Check firewall
+sudo ufw status
+sudo firewall-cmd --list-all
+
+# View mount errors
+dmesg | tail -20
+
+# Check system logs
+journalctl -xe
+```
 
 ---
 
@@ -554,13 +543,6 @@ A VPC (Virtual Private Cloud) is a private virtual network created inside the AW
 
 ---
 
-## One-line Interview Answer
-
-> A Network is a collection of interconnected devices that communicate and share resources using standard networking protocols.
----
-
----
-
 # Q2. What is the TCP/IP Model?
 
 ## Topic Information
@@ -605,12 +587,12 @@ The TCP/IP model provides a common set of rules that enables all devices connect
 
 ## Quick Revision
 
-| Layer | Purpose | Examples |
-|-------|---------|----------|
-| **Application Layer** | Provides network services to applications | SSH, HTTP, HTTPS, DNS, NFS |
-| **Transport Layer** | End-to-end communication and port management | TCP, UDP |
-| **Internet Layer** | Logical addressing and routing | IPv4, IPv6 |
-| **Network Access Layer** | Physical transmission of data | Ethernet, Wi-Fi, MAC Address, NIC |
+| Layer                      | Purpose                                     | Examples                         |
+|----------------------------|---------------------------------------------|----------------------------------|
+| **Application Layer**      | Provides network services to applications   | SSH, HTTP, HTTPS, DNS, NFS       |
+| **Transport Layer**        | End-to-end communication and port management| TCP, UDP                         |
+| **Internet Layer**         | Logical addressing and routing              | IPv4, IPv6                       |
+| **Network Access Layer**   | Physical transmission of data               | Ethernet, Wi-Fi, MAC Address, NIC|
 
 ---
 
@@ -745,14 +727,6 @@ Unable to connect to an EC2 instance using SSH.
 | **Transport Layer** | Is Port `22` allowed in the Security Group and Network ACL? |
 | **Internet Layer** | Does the EC2 instance have the correct Public IP? |
 | **Network Access Layer** | Is the EC2 instance reachable through the network? |
-
----
-
-## Interview Tip
-
-Interviewers often ask networking questions by referring to the TCP/IP layers.
-
-Instead of troubleshooting randomly, identify **which layer is failing**, then investigate only that layer.
 
 ---
 
