@@ -530,7 +530,68 @@ A VPC (Virtual Private Cloud) is a private virtual network created inside the AW
 | Connects Specific Devices | Connects Millions of Networks Worldwide |
 
 ---
-
+Complete Internet Workflow (Home to Google and Back)
+```Diagram
+                           GOOGLE DATA CENTER
+                     (Thousands of servers running Google services)
+                                      ▲
+                                      │
+                         Internet Exchange (IX)
+              (A place where different ISPs and companies connect)
+                                      ▲
+                                      │
+                     ISP National/Core Backbone
+        (Very high-speed fiber network connecting major cities)
+                                      ▲
+                                      │
+                           ISP Regional Network
+         (Connects different cities and regions to the core network)
+                                      ▲
+                                      │
+                         ISP POP / Local Exchange
+    (Point of Presence - nearest ISP office with networking equipment)
+                                      ▲
+                                      │
+                      OLT (Optical Line Terminal)
+      (Device that communicates with thousands of customers' ONTs)
+                                      ▲
+                                      │
+                     Underground Fiber Network
+      (Fiber cables running under roads inside protective ducts)
+                                      ▲
+                                      │
+                   Street Junction / Fiber Cabinet
+    (Small underground chamber or roadside cabinet for fiber splicing)
+                                      ▲
+                                      │
+                     Building Fiber Distribution Box
+     (Splits one fiber cable into individual fibers for each flat)
+                                      ▲
+                                      │
+                   Thin White Fiber Cable
+        (Dedicated fiber cable going from the building to your flat)
+                                      ▲
+                                      │
+               ONT (Optical Network Terminal)
+      (Converts light signals from fiber into Ethernet signals)
+                                      ▲
+                                      │
+                  Ethernet Cable (RJ45)
+      (Carries digital network data between ONT and Router)
+                                      ▲
+                                      │
+                     Wi-Fi Router
+ (Creates your home network, gives IP addresses, provides Wi-Fi)
+                                      ▲
+                                      │
+                          Wi-Fi Signal
+      (Radio waves between router and wireless devices)
+                                      ▲
+                                      │
+                     Your Laptop
+      (Runs Chrome, Firefox, VS Code, Terminal, etc.)
+```
+---
 ## Related Topics
 
 - TCP/IP Model
